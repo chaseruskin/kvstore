@@ -30,9 +30,20 @@ Viewing a key's value only requires the `key` argument to be passed. A key that 
 
 ## Ideas/Extensions
 
-- customizable flags. `--preview` show the before/after state of key before asking user if it's okay to save when editing. `--set` could set the key-value pair as an env variable in the current working terminal session.
+- [ ] `--preview` show the before/after state of key before asking user if it's okay to save when editing. 
 
-[x] allow user to define where to place `kv.db` file using an env variable `KVSTORE_HOME`.
+- [ ] `--init` could set the key-value pair as an env variable in the current working terminal session. Having no key & value arg will default to initialize all key-values as environment variables. 
 
+- [ ] `--home=<dir>` to override a particular location of `kv.db` file for the given program call. Has precedence over `KVSTORE_HOME`.
 
-- allow special syntax to prepend/append to an existing key-value pair. Example: `kvstore rpath @:/usr/local/bin`. Here the `@` symbol copies the existing value for key `rpath` to be restored with `:/usr/local/bin` appended
+- [ ] `--all` to view all key-value pairs.
+
+- [x] allow user to define where to place `kv.db` file using an env variable `KVSTORE_HOME`.
+
+- [ ] allow special syntax to prepend/append to an existing key-value pair.
+
+    `$ kvstore rpath @:/usr/local/bin`
+    
+    Here the `@` symbol copies the existing value for key `rpath` to be restored with `:/usr/local/bin` appended. A current workaround is to use shell like: 
+
+    `$ kvstore rpath $(kvstore rpath):/usr/local/bin`
