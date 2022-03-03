@@ -153,20 +153,23 @@ mod test {
     #[test]
     fn db_new() {
         // non-existing file (creates new)
-        fs::remove_file("./data/unknown.db").unwrap_or(());
-        let db = Database::new("./data/unknown.db");
+        let file = env::temp_dir().join("test.db");
+        fs::remove_file(&file).unwrap_or(());
+        let db = Database::new(file.to_str().unwrap());
         assert!(db.is_ok());
         // existing file
-        let db = Database::new("./data/kv-test.db");
+        let db = Database::new(file.to_str().unwrap());
         assert!(db.is_ok());
         // a file with invalid format
-        let db = Database::new("./data/kv-invalid.db");
+        fs::write(&file, format!("hello world\ngo gators\n")).unwrap();
+        let db = Database::new("test.db");
         assert!(db.is_err());
     }
 
     #[test]
     fn db_edit() {
-        let mut db = Database::new("./data/kv-test.db").unwrap();
+        let file = env::temp_dir().join("test1.db");
+        let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
         db.edit("hello", "world");
         assert_eq!(db.inner.get("hello"), Some(&"world".to_owned()));
@@ -180,7 +183,8 @@ mod test {
 
     #[test]
     fn db_read() {
-        let mut db = Database::new("./data/kv-test.db").unwrap();
+        let file = env::temp_dir().join("test2.db");
+        let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
         db.edit("hello", "earth");
         db.edit("bonjour", "venus");
@@ -197,7 +201,8 @@ mod test {
 
     #[test]
     fn db_save() {
-        let mut db = Database::new("./data/kv-test.db").unwrap();
+        let file = env::temp_dir().join("test3.db");
+        let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
         db.edit("hello", "earth");
         db.edit("bonjour", "venus");
@@ -206,14 +211,15 @@ mod test {
 
     #[test]
     fn db_reload_session() {
-        let mut db = Database::new("./data/kv-test.db").unwrap();
+        let file = env::temp_dir().join("test4.db");
+        let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
         db.edit("hello", "earth");
         db.edit("bonjour", "venus");
         assert!(db.save().is_ok());
 
         // re-load file
-        let db = Database::new("./data/kv-test.db").unwrap();
+        let db = Database::new(file.to_str().unwrap()).unwrap();
         // existing keys
         let r = db.view("hello");
         assert_eq!(r, Some(&"earth".to_owned()));
