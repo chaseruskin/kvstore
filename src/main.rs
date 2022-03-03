@@ -3,9 +3,8 @@ use std::fs;
 use std::env;
 
 fn main() {
-    let root = env::var("KVSTORE_PATH").unwrap_or(".".to_owned());
-    
     let mut args = env::args().skip(1);
+    let root = env::var("KVSTORE_HOME").unwrap_or(".".to_owned());
     let mut db = match Database::new(&(root+"/kv.db")) {
         Ok(x) => x,
         Err(e) => {
@@ -17,7 +16,7 @@ fn main() {
     let key = if let Some(k) = args.next() {
         k
     } else {
-        eprintln!("kv-error: Expecting <key> argument");
+        println!("{}", USAGE);
         return;
     };
 
@@ -40,6 +39,21 @@ fn main() {
         println!("kv-info: Save successful")
     }
 }
+
+const USAGE: &str = "\
+kvstore is a key-value keeper.
+
+Usage:
+    kvstore [<key>] [<value>]
+
+Args:
+    <key>       label to identify data
+    <value>     data to store behind a label
+
+Discussion:
+    kvstore's database is a 'kv.db' file located where the program is ran
+    unless the enviornment variable KVSTORE_HOME is set to an existing 
+    directory.";
 
 struct Database {
     filename: String,

@@ -5,14 +5,19 @@
 Inspired by the Microsoft Reactor Rust programming talk __[Rust Programming: Moving Beyond “Hello World”](https://www.youtube.com/watch?v=5dRT_v3hrZ0)__ by Ryan Levick.
 
 ```
-USAGE:  
-    kvstore <key> [value]
+kvstore is a key-value keeper.
 
-ARGS:
-    <key>       label for data
+Usage:
+    kvstore [<key>] [<value>]
 
-OPTIONS:
-    value       data to attach to <key>
+Args:
+    <key>       label to identify data
+    <value>     data to store behind a label
+
+Discussion:
+    kvstore's database is a 'kv.db' file located where the program is ran
+    unless the enviornment variable KVSTORE_HOME is set to an existing 
+    directory.
 ```
 
 ## Editing
@@ -27,7 +32,7 @@ Viewing a key's value only requires the `key` argument to be passed. A key that 
 
 - customizable flags. `--preview` show the before/after state of key before asking user if it's okay to save when editing. `--set` could set the key-value pair as an env variable in the current working terminal session.
 
-- allow user to define where to place `kv.db` file using an env variable `KVSTORE_PATH`.
+[x] allow user to define where to place `kv.db` file using an env variable `KVSTORE_HOME`.
 
 
 - allow special syntax to prepend/append to an existing key-value pair. Example: `kvstore rpath @:/usr/local/bin`. Here the `@` symbol copies the existing value for key `rpath` to be restored with `:/usr/local/bin` appended
