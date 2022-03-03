@@ -162,7 +162,7 @@ mod test {
         assert!(db.is_ok());
         // a file with invalid format
         fs::write(&file, format!("hello world\ngo gators\n")).unwrap();
-        let db = Database::new("test.db");
+        let db = Database::new(file.to_str().unwrap());
         assert!(db.is_err());
     }
 
