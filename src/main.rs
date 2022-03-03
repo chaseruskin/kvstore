@@ -3,8 +3,10 @@ use std::fs;
 use std::env;
 
 fn main() {
+    let root = env::var("KVSTORE_PATH").unwrap_or(".".to_owned());
+    
     let mut args = env::args().skip(1);
-    let mut db = match Database::new("kv.db") {
+    let mut db = match Database::new(&(root+"/kv.db")) {
         Ok(x) => x,
         Err(e) => {
             eprintln!("kv-error: {}", e);
@@ -47,10 +49,16 @@ struct Database {
 impl Database {
     /// Create a new database. Can fail on now able to read the .db file.
     pub fn new(path: &str) -> Result<Database, Box<dyn Error>> {
-        let contents = fs::read_to_string(path)?;
+        let mut file = OpenOptions::new()
+            .read(true)
+            .append(true)
+            .create(true)
+            .open(path)?;
+        let mut contents = Vec::<u8>::new();
+        file.read_to_end(&mut contents)?;
         let mut inner = HashMap::new();
 
-        for line in contents.lines() {
+        for line in std::str::from_utf8(&contents)?.lines() {
             let chunks: Vec<&str> = line.split('\t').collect();
             if chunks.len() != 2 {
                 return Err(Box::new(KvError::InvalidFormat(chunks.len()-1)));
@@ -89,6 +97,8 @@ impl Database {
 use std::fmt::Display;
 use std::fmt::Debug;
 use std::error::Error;
+use std::fs::OpenOptions;
+use std::io::Read;
 
 enum KvError {
     InvalidFormat(usize),
@@ -118,9 +128,9 @@ mod test {
 
     #[test]
     fn db_new() {
-        // non-existing file
+        // non-existing file (creates new)
         let db = Database::new("./data/unknown.db");
-        assert!(db.is_err());
+        assert!(db.is_ok());
         // existing file
         let db = Database::new("./data/kv-test.db");
         assert!(db.is_ok());
