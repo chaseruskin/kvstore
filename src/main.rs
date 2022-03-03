@@ -1,3 +1,13 @@
+//! Crate    : kvstore
+//! Author   : Chase Ruskin
+//! File     : main.rs
+//! Abstract : 
+//!     Entry-point to `kvstore` command-line tool. The main process follows
+//!         1. reads env and accept arguments, 
+//!         2. loads database from a file, 
+//!         3. interacts with database
+//!         4. Saves any necessary changes to database.
+
 use std::collections::HashMap;
 use std::fs;
 use std::env;
@@ -143,6 +153,7 @@ mod test {
     #[test]
     fn db_new() {
         // non-existing file (creates new)
+        fs::remove_file("./data/unknown.db").unwrap_or(());
         let db = Database::new("./data/unknown.db");
         assert!(db.is_ok());
         // existing file
