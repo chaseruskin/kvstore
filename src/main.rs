@@ -60,9 +60,9 @@ Args:
     <key>       label to identify data
     <value>     data to store behind a label
 
-Discussion:
+More:
     kvstore's database is a 'kv.db' file located where the program is ran
-    unless the enviornment variable KVSTORE_HOME is set to an existing 
+    unless the environment variable KVSTORE_HOME is set to an existing 
     directory.";
 
 struct Database {
