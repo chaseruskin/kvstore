@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::hash_map::Keys;
 use std::fs;
 
 pub struct Database {
@@ -41,6 +42,10 @@ impl Database {
     /// References the value behind a requested key, if exists.
     pub fn view(&self, key: &str) -> Option<&String> {
         self.inner.get(key)
+    }
+
+    pub fn get_keys(&self) -> Keys<'_, String, String> {
+        self.inner.keys()
     }
 
     /// Takes contents of hashmap, then writes them back to disc.

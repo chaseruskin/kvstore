@@ -32,9 +32,26 @@ fn main() {
     match args.next() {
         Some(value) => db.edit(&key, &value),
         None => {
+            // print value for corresponding key
             if let Some(v) = db.view(&key) {
                 println!("{}", v);
-            } else {
+            // print all key-values
+            } else if key == "."  {
+                let max = db.get_keys()
+                    .fold(0, |max, k| {
+                        if k.len() > max { k.len() } else { max }
+                });
+                db.get_keys().for_each(|k| {
+                    let v = db.view(&k).unwrap();
+                    if v.is_empty() == false {
+                        print!("{}", &k);
+                        print!("{:<1$}", "", max-k.len()+4);
+                        println!("{}", v);
+                    }
+                });
+            }
+            // key does not exist- print empty line
+            else {
                 println!("");
                 return;
             };
@@ -60,6 +77,8 @@ Args:
     <value>     data to store behind a label
 
 More:
+    Enter only a <key> to view its value. To view all values, pass '.'.
+
     kvstore's database is a 'kv.db' file located where the program is ran
     unless the environment variable KVSTORE_HOME is set to an existing 
     directory.";
