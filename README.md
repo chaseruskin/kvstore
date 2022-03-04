@@ -15,6 +15,8 @@ Args:
     <value>     data to store behind a label
 
 More:
+    Enter only a <key> to view its value. To view all values, pass '.'.
+
     kvstore's database is a 'kv.db' file located where the program is ran
     unless the environment variable KVSTORE_HOME is set to an existing 
     directory.
@@ -36,7 +38,7 @@ Viewing a key's value only requires the `key` argument to be passed. A key that 
 
 - [ ] `--home=<dir>` to override a particular location of `kv.db` file for the given program call. Has precedence over `KVSTORE_HOME`.
 
-- [ ] `--all` to view all key-value pairs.
+- [x] Pass '.' as key to view all key-value pairs (skips keys with blank values).
 
 - [x] allow user to define where to place `kv.db` file using an env variable `KVSTORE_HOME`.
 
