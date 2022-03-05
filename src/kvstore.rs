@@ -42,17 +42,23 @@ impl KvStore {
             // env var already set
             Ok(evar) => {
                 // make special appending to PATH env var
-                let sep = if cfg!(unix) {':'} else if cfg!(windows) {';'} else {','};
                 if key == "PATH" {
+                    let sep = if cfg!(unix) {':'} 
+                        else if cfg!(windows) {';'} 
+                        else {','};
                     // remove duplicate paths found in key's value
-                    let evar = std::env::join_paths(
-                        evar.split(sep).filter(|&p| {
-                            val.split(sep).find(|&s| s == p).is_none()
+                    let val = std::env::join_paths(
+                        val.split(sep).filter(|&p| {
+                            evar.split(sep).find(|&s| s == p).is_none()   
                         }))
                         .unwrap();
-                    let val = std::env::join_paths(val.split(sep)).unwrap();
-                    // todo: remove what duplication occurs in evar
-                    format!("{}={:?}{}{} ", key, evar.to_str().unwrap(), sep, val.to_str().unwrap())
+                    // no new paths to add
+                    if val.is_empty() {
+                        "".to_string()
+                    // there are new paths to add
+                    } else {
+                        format!("{}={}{}{} ", key, evar, sep, val.to_str().unwrap())
+                    }
                 } else {
                     "".to_string()
                 }
