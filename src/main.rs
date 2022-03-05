@@ -10,9 +10,10 @@
 
 use kvstore::database::*;
 use std::env;
+use kvstore::cli::*;
 
 fn main() {
-    let mut args = env::args().skip(1);
+    let mut cli = Cli::new(env::args());
     let root = env::var("KVSTORE_HOME").unwrap_or(".".to_owned());
     let mut db = match Database::new(&(root+"/kv.db")) {
         Ok(x) => x,
@@ -22,14 +23,14 @@ fn main() {
         }
     };
 
-    let key = if let Some(k) = args.next() {
+    let key = if let Some(k) = cli.next_arg() {
         k
     } else {
         println!("{}", USAGE);
         return;
     };
 
-    match args.next() {
+    match cli.next_arg() {
         Some(value) => db.edit(&key, &value),
         None => {
             // print value for corresponding key
