@@ -31,28 +31,40 @@ impl KvStore {
         }
     }
 
+    fn set_key_to_var(&self, key: &str) -> String {
+        // check if the key does not exist in env var
+        let val = self.db.view(key).unwrap();
+        match std::env::var(key) {
+            // env var does not exist
+            Err(_) => {
+                format!("{}={} ", key, val)
+            }
+            // env var already set
+            Ok(evar) => {
+                // make special appending to PATH env var
+                let sep = if cfg!(unix) {':'} else if cfg!(windows) {';'} else {','};
+                if key == "PATH" {
+                    // remove duplicate paths found in key's value
+                    let evar = std::env::join_paths(
+                        evar.split(sep).filter(|&p| {
+                            val.split(sep).find(|&s| s == p).is_none()
+                        }))
+                        .unwrap();
+                    let val = std::env::join_paths(val.split(sep)).unwrap();
+                    // todo: remove what duplication occurs in evar
+                    format!("{}={:?}{}{} ", key, evar.to_str().unwrap(), sep, val.to_str().unwrap())
+                } else {
+                    "".to_string()
+                }
+            }
+        }
+    }
+
     fn boot_env(&self) -> Result<String, Box<dyn Error>> {
         let mut iter = self.db.get_keys();
         let mut result = String::new();
         while let Some(key) = iter.next() {
-            // check if the key does not exist in env var
-            let val = self.db.view(key).unwrap();
-            match std::env::var(key) {
-                // env var does not exist
-                Err(_) => {
-                    result += &(format!("{}={} ", key, val));
-                }
-                // env var already set
-                Ok(evar) => {
-                    // make special appending to PATH env var
-                    if key == "PATH" {
-                        // only add if does not previously contain
-                        if evar.contains(val) == false {
-                            result += &(format!("{}={}{} ", key, evar, val));
-                        }
-                    }
-                }
-            };
+            result += &self.set_key_to_var(key);
         }
         Ok(result)
     }
