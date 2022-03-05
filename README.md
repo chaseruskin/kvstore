@@ -8,12 +8,17 @@ Inspired by the Microsoft Reactor Rust programming talk __[Rust Programming: Mov
 kvstore is a key-value keeper.
 
 Usage:
-    kvstore [<key>] [<value>]
+    kvstore [<key>] [<value>] [flags]
 
 Args:
     <key>       label to identify data
     <value>     data to store behind a label
 
+Flags:
+    --init      list pairs in exporting environment format to stdout 
+    --version   print the current version
+    --help      print help information
+    
 More:
     Enter only a <key> to view its value. To view all values, pass '.'.
 
