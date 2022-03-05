@@ -16,6 +16,7 @@ Args:
 
 Flags:
     --init      list pairs in exporting environment format to stdout 
+    --append    add additional <value> to existing value behind given <key>
     --version   print the current version
     --help      print help information
 

@@ -35,8 +35,12 @@ impl Database {
     }
 
     /// Adds/edits a key with value taken from args.
-    pub fn edit(&mut self, key: &str, value: &str) {
-        self.inner.insert(key.to_owned(), value.to_owned());
+    pub fn edit(&mut self, key: &str, value: &str, app: bool) {
+        if let Some(prev) = self.inner.insert(key.to_owned(), value.to_owned()) {
+            if app {
+                self.inner.insert(key.to_owned(), prev+value);
+            }
+        }
     }
 
     /// References the value behind a requested key, if exists.
@@ -113,12 +117,12 @@ mod test {
         let file = env::temp_dir().join("test1.db");
         let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
-        db.edit("hello", "world");
+        db.edit("hello", "world", false);
         assert_eq!(db.inner.get("hello"), Some(&"world".to_owned()));
         // overwrite existing key-value pair
-        db.edit("hello", "earth");
+        db.edit("hello", "earth", false);
         // add another key-value pair
-        db.edit("bonjour", "venus");
+        db.edit("bonjour", "venus", false);
         assert_eq!(db.inner.get("hello"), Some(&"earth".to_owned()));
         assert_eq!(db.inner.get("bonjour"), Some(&"venus".to_owned()));
     }
@@ -128,8 +132,8 @@ mod test {
         let file = env::temp_dir().join("test2.db");
         let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
-        db.edit("hello", "earth");
-        db.edit("bonjour", "venus");
+        db.edit("hello", "earth", false);
+        db.edit("bonjour", "venus", false);
 
         // existing keys
         let r = db.view("hello");
@@ -146,8 +150,8 @@ mod test {
         let file = env::temp_dir().join("test3.db");
         let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
-        db.edit("hello", "earth");
-        db.edit("bonjour", "venus");
+        db.edit("hello", "earth", false);
+        db.edit("bonjour", "venus", false);
         assert!(db.save().is_ok());
     }
 
@@ -156,8 +160,8 @@ mod test {
         let file = env::temp_dir().join("test4.db");
         let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
-        db.edit("hello", "earth");
-        db.edit("bonjour", "venus");
+        db.edit("hello", "earth", false);
+        db.edit("bonjour", "venus", false);
         assert!(db.save().is_ok());
 
         // re-load file

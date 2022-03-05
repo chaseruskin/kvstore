@@ -9,6 +9,7 @@ pub struct KvStore {
     init: bool,
     help: bool,
     version: bool,
+    append: bool,
 }
 
 impl KvStore {
@@ -23,6 +24,7 @@ impl KvStore {
             init: cli.check_flag("--init"),
             help: cli.check_flag("--help"),
             version: cli.check_flag("--version"),
+            append: cli.check_flag("--append"),
         };
         if let Some(a) = cli.next_arg() {
             Err(Box::new(KvError::UnknownArg(a)))
@@ -89,7 +91,7 @@ impl KvStore {
         let key = self.key.as_ref().unwrap();
         let result = Ok(match &self.value {
             Some(value) => {
-                self.db.edit(&key, &value);
+                self.db.edit(&key, &value, self.append);
                 self.db.save()?;
                 "kv-info: Save successful".to_string()
             }
@@ -167,8 +169,8 @@ mod test {
         let file = env::temp_dir().join(name.to_owned()+".db");
         let mut db = Database::new(file.to_str().unwrap()).unwrap();
         // create new key-value pair
-        db.edit("hello", "earth");
-        db.edit("bonjour", "venus");
+        db.edit("hello", "earth", false);
+        db.edit("bonjour", "venus", false);
         db
     }
 
@@ -181,6 +183,7 @@ mod test {
             init: false,
             help: false,
             version: false,
+            append: false,
         };
         assert_eq!(kv.run().unwrap(), "earth".to_owned());
 
@@ -200,6 +203,7 @@ mod test {
             init: false,
             help: true,
             version: false,
+            append: false,
         };
         assert_eq!(kv.run().unwrap(), crate::USAGE.to_owned());
 
@@ -226,8 +230,24 @@ mod test {
             init: false,
             help: false,
             version: false,
+            append: false,
         };
         assert_eq!(kv.run().unwrap(), "kv-info: Save successful".to_owned());
+    }
+
+    #[test]
+    fn edit_and_append_arg() {
+        let mut kv = KvStore {
+            db: mock_db("edit_and_append_arg"),
+            key: Some("hello".to_owned()),
+            value: Some(":world".to_owned()),
+            init: false,
+            help: false,
+            version: false,
+            append: true,
+        };
+        kv.run().expect("save failed");
+        assert_eq!(kv.db.view("hello").unwrap(), &"earth:world".to_owned());
     }
 
 }
