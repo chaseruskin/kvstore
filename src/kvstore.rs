@@ -34,15 +34,25 @@ impl KvStore {
     fn boot_env(&self) -> Result<String, Box<dyn Error>> {
         let mut iter = self.db.get_keys();
         let mut result = String::new();
-        while let Some(k) = iter.next() {
+        while let Some(key) = iter.next() {
             // check if the key does not exist in env var
-            if std::env::var(k).is_err() {
-                eprintln!("kv-info: {}={}", k, self.db.view(k).unwrap());
-                result += &(format!("{}={} ", k, self.db.view(k).unwrap()));
-            // tell user what the env var is already set to
-            } else {
-                eprintln!("kv-warning: {}={}", k, std::env::var(k).unwrap());
-            }
+            let val = self.db.view(key).unwrap();
+            match std::env::var(key) {
+                // env var does not exist
+                Err(_) => {
+                    result += &(format!("{}={} ", key, val));
+                }
+                // env var already set
+                Ok(evar) => {
+                    // make special appending to PATH env var
+                    if key == "PATH" {
+                        // only add if does not previously contain
+                        if evar.contains(val) == false {
+                            result += &(format!("{}={}{} ", key, evar, val));
+                        }
+                    }
+                }
+            };
         }
         Ok(result)
     }

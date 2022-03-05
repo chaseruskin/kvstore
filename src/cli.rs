@@ -72,7 +72,7 @@ mod test {
 
     #[test]
     fn check_flag() {
-        let mut cli = Cli {
+        let cli = Cli {
             args: vec![String::from("hello"), String::from("world")],
             flags: vec![String::from("--init")],
         };
