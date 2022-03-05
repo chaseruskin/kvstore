@@ -50,7 +50,7 @@ world
 You can initialize the database as environment variables for the current terminal session. For zsh/bash, this can look like the following:
 
 ```
-$ export `kvstore --init` 
+$ export `kvstore --init`
 ```
 
 > __Note:__ You can include that line in a terminal profile file to run everytime a terminal session is created.
@@ -58,7 +58,8 @@ $ export `kvstore --init`
 To preview what variables would be set, run without command substitution.
 
 ```
-$ kvstore --init 
+$ kvstore --init
+hello=world
 ```
 
 > __Note:__ If no output is visible, that may mean either the environment variables are already set from the key-values, or you have have zero key-values in your database.
