@@ -3,7 +3,6 @@ use std::env;
 use crate::database::Database;
 
 pub struct KvStore {
-    path: String,
     db: Database,
     key: Option<String>,
     value: Option<String>,
@@ -15,11 +14,10 @@ pub struct KvStore {
 impl KvStore {
 
     pub fn new(mut cli: Cli) -> Result<KvStore, Box<dyn Error>> {
-        let path = env::var("KVSTORE_HOME")
-            .unwrap_or(".".to_owned())+"/kv.db";
+        let root = env::var("KVSTORE_HOME")
+            .unwrap_or(".".to_owned());
         let kv = KvStore {
-            db: Database::new(&path)?,
-            path: path,
+            db: Database::new(&(root+"/kv.db"))?,
             key: cli.next_arg(),
             value: cli.next_arg(),
             init: cli.check_flag("--init"),
@@ -149,7 +147,6 @@ mod test {
     #[test]
     fn view_arg() {
         let mut kv = KvStore {
-            path: "".to_owned(),
             db: mock_db("view_arg"),
             key: Some("hello".to_owned()),
             value: None,
@@ -169,7 +166,6 @@ mod test {
     #[test]
     fn disp_help_version() {
         let mut kv = KvStore {
-            path: "".to_owned(),
             db: mock_db("disp_help_version"),
             key: None,
             value: None,
@@ -196,7 +192,6 @@ mod test {
     #[test]
     fn edit_arg() {
         let mut kv = KvStore {
-            path: "".to_owned(),
             db: mock_db("edit_arg"),
             key: Some("hello".to_owned()),
             value: Some("world".to_owned()),
