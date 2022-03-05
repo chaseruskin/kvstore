@@ -18,7 +18,7 @@ Flags:
     --init      list pairs in exporting environment format to stdout 
     --version   print the current version
     --help      print help information
-    
+
 More:
     Enter only a <key> to view its value. To view all values, pass '.'.
 
@@ -31,15 +31,43 @@ More:
 
 Adding/updating a key will require you to pass the new value for it as `value`. Values will be overridden if one already exists for the given `key`.
 
+``` 
+$ kvstore hello world
+kv-info: Save successful
+```
+
 ## Viewing
 
 Viewing a key's value only requires the `key` argument to be passed. A key that does not exist will return a blank line.
+
+``` 
+$ kvstore hello
+world
+```
+
+## Initializing
+
+You can initialize the database as environment variables for the current terminal session. For zsh/bash, this can look like the following:
+
+```
+$ export `kvstore --init` 
+```
+
+> __Note:__ You can include that line in a terminal profile file to run everytime a terminal session is created.
+
+To preview what variables would be set, run without command substitution.
+
+```
+$ kvstore --init 
+```
+
+> __Note:__ If no output is visible, that may mean either the environment variables are already set from the key-values, or you have have zero key-values in your database.
 
 ## Ideas/Extensions
 
 - [ ] `--preview` show the before/after state of key before asking user if it's okay to save when editing. 
 
-- [ ] `--init` could set the key-value pair as an env variable in the current working terminal session. Having no key & value arg will default to initialize all key-values as environment variables. 
+- [x] `--init` could set the key-value pair as an env variable in the current working terminal session. Having no key & value arg will default to initialize all key-values as environment variables. 
 
 - [ ] `--home=<dir>` to override a particular location of `kv.db` file for the given program call. Has precedence over `KVSTORE_HOME`.
 
